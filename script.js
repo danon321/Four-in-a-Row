@@ -12,19 +12,20 @@ function searchedElementDirects(board, startingPlace, searchedElement){
     [0,-1]]; //left-mid
 
     // Disable all coordinates that are out of border
-    let enableDirections = directions.filter( element => {
-            let firstCoordinate = startingPlace[0] + element[0];
-            let secoundCoordinate = startingPlace[1] + element[1];
+    let enableDirections = directions.filter( direction => {
+            let firstCoordinate = startingPlace[0] + direction[0];
+            let secoundCoordinate = startingPlace[1] + direction[1];
 
-            if(coordsInBoard(board, firstCoordinate, secoundCoordinate ))
-                return element;
+            if(coordsInBoard(board, firstCoordinate, secoundCoordinate))
+                return direction;
     })
 
     // Return all directions with searched element
-    return enableDirections.filter( element => {
-        let valueOfDirection = board[startingPlace[0] + element[0]][startingPlace[1] + element[1]];
+    return enableDirections.filter( direction => {
+        let valueOfDirection = board[startingPlace[0] + direction[0]][startingPlace[1] + direction[1]];
 
-        if(valueOfDirection === searchedElement) return element;
+        if(valueOfDirection === searchedElement) 
+            return direction;
     })
 }
 
@@ -33,59 +34,50 @@ function coordsInBoard(board, firstCord, secCord) {
     return (firstCord < board.length) && (secCord < board.length) && (firstCord >= 0) && (secCord >= 0) ? true : false;
 }
 
-function numbOfItemInSequence(board, direction, startingPlace, searchedElement){
-    let itemsInSequence = 0;
-    let currentDirect = direction[1];
+function sumCords(firstCord, secoundCord) {
+    return [firstCord[0] + secoundCord[0], firstCord[1] + secoundCord[1]];
+}
+
+function numbOfItemInDirection(board, currentDirection, startingPlace, searchedElement){
+    let itemsInDirection = 0;
     let currentPosition = startingPlace;
-    let reverseDirect = direction[1].map(element => {
-        return element * -1;
-    })
+    let reverseDirection = currentDirection.map( coordinate => coordinate * -1);
     
     function nextElementValue(board, direction, start){
 
         if(coordsInBoard(board, start[0], start[1]) && board[start[0]][start[1]] == searchedElement){
-            start = [start[0] + direction[0], start[1] + direction[1]];
-            itemsInSequence++;
-            nextElementValue(board, direction, [start[0], start[1]])
+            start = sumCords(start, direction);
+            itemsInDirection++;
+            nextElementValue(board, direction, [start[0], start[1]]);
         }
 
         return false;
-            // reverse = true;
-            // let reverseDirection = direction.map(element => {
-            //     return element * -1;
-            // })
-
-            // start = [startingPlace[0] + reverseDirection[0], startingPlace[1] + reverseDirection[1]];
-
-            // console.log(start)
-
-            // if(coordsInBoard(board, start[0], start[1]) && board[start[0]][start[1]] == searchedElement){
-            //     itemsInSequence++;
-            //     console.log(reverseDirection)
-            //     nextElementValue(board, reverseDirection, [start[0], start[1]]);
-            // }
-        
     }
 
-    if(!nextElementValue(board, currentDirect, currentPosition))
-        nextElementValue(board, reverseDirect, currentPosition)
+    if(!nextElementValue(board, currentDirection, currentPosition))
+        nextElementValue(board, reverseDirection, sumCords(currentPosition, reverseDirection));
 
-
-    return itemsInSequence;
+    return itemsInDirection;
 }
 
 let board = 
     [
-        ["X","X","O","O"],
-        ["X","X","O","X"],
-        ["O","O","X","X"],
-        ["X","O","X","X"]
+        ["X","X","O","O","O"],
+        ["X","X","O","X","O"],
+        ["O","O","X","X","O"],
+        ["X","O","X","X","O"],
+        ["X","O","X","X","X"]
     ];
 
-console.log(numbOfItemInSequence(
+let start = [0,0];
+let find = "X";
+
+console.log(numbOfItemInDirection(
     board,
-    searchedElementDirects(board, [0,0], "X"),
-    [1,1],
-    "X"
+    [1, 1],
+    start,
+    find
 ))
+
+console.log(searchedElementDirects(board, start, find))
 
