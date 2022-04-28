@@ -1,12 +1,37 @@
 
 let player = {
     number: 1,
-    playerSymbol: "X",
-    circlePlaced: [0, 0],
+    symbol: "X",
+    place: [1, 1],
     hisTurn: true
 }
 
-function searchedElementDirects(board, startingPlace, searchedElement){
+let boardSize = 5;
+
+function createBoard(rows, columns){
+    let board = [];
+    let boardEl = document.querySelector('.board');
+
+    for(let i = 1; i <= rows; i++){
+        let row = [];
+
+        for(let j = 1; j <= columns; j++){
+            let cell = document.createElement('div');
+            cell.setAttribute('data-column', j);
+            cell.setAttribute('data-row', i);
+            row.push('empty');
+            boardEl.appendChild(cell);
+        }
+        board.push(row);
+    }
+    return board;
+}
+
+console.log(createBoard(3,4));
+
+function searchedElementDirects(board, player){
+    let startingPlace = player.place;
+    let searchedElement = player.symbol;
     const directions = 
     [[-1,-1], //top-left
     [-1,0], //top-mid
@@ -37,7 +62,9 @@ function sumCords(firstCord, secoundCord) {
     return [firstCord[0] + secoundCord[0], firstCord[1] + secoundCord[1]];
 }
 
-function pointsInDirection(board, currentDirection, startingPlace, searchedElement){
+function pointsInDirection(board, currentDirection, player){
+    let startingPlace = player.place;
+    let searchedElement = player.symbol;
     let points = 0;
     let path = [];
     let reverseDirection = currentDirection.map( coordinate => coordinate * -1);
@@ -60,10 +87,10 @@ function pointsInDirection(board, currentDirection, startingPlace, searchedEleme
     return {points, path};
 }
 
-function checkPointsInAllDirections(board, directions, startingPlace, searchedElement, winPoints) {
+function checkIfPlayerWon(board, directions, player, winPoints) {
     for(let i = 0; i < directions.length; i++) {
-        if(pointsInDirection(board, directions[i], startingPlace, searchedElement).points >= winPoints) {
-            console.log("WYGRAŁ JEBANY!", pointsInDirection(board, directions[i], startingPlace, searchedElement).path)
+        if(pointsInDirection(board, directions[i], player).points >= winPoints) {
+            console.log("WYGRAŁ JEBANY!", pointsInDirection(board, directions[i], player).path)
             return "WYGRANA";
         }
 
@@ -73,27 +100,19 @@ function checkPointsInAllDirections(board, directions, startingPlace, searchedEl
 
 let board = 
     [
-        ["X","X","O","O","O"],
-        ["X","O","O","X","O"],
-        ["O","O","X","X","O"],
-        ["X","O","X","X","O"],
-        ["X","O","X","X","X"]
+        ["X","X","O","O","O","O","O"],
+        ["X","X","O","X","O","O","O"],
+        ["O","O","X","X","O","O","O"],
+        ["X","O","X","X","O","O","O"],
+        ["X","O","X","X","X","O","O"],
+        ["X","O","X","X","X","O","O"]
     ];
 
-let start = [1, 3];
-let find = "X";
 
-// console.log(pointsInDirection(
-//     board,
-//     [1, 1],
-//     start,
-//     find
-// ))
 
-console.log(checkPointsInAllDirections(
+console.log(checkIfPlayerWon(
     board,
-    searchedElementDirects(board, start, find),
-    start,
-    find,
+    searchedElementDirects(board, player),
+    player,
     4))
 
