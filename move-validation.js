@@ -1,25 +1,30 @@
+//Board settings
+let boardRow = 6;
+let boardCol = 7;
+let board = [];
+let boardEl = document.querySelector('.board');
 
+//Players
 let player = {
     number: 1,
     symbol: "X",
-    place: [1, 1],
+    place: [],
     hisTurn: true
 }
 
-let boardSize = 5;
+let rootCss = document.querySelector(':root');
+
 
 function createBoard(rows, columns){
-    let board = [];
-    let boardEl = document.querySelector('.board');
 
-    for(let i = 1; i <= rows; i++){
+    for(let i = 0; i < rows; i++){
         let row = [];
 
-        for(let j = 1; j <= columns; j++){
+        for(let j = 0; j < columns; j++){
             let cell = document.createElement('div');
             cell.setAttribute('data-column', j);
             cell.setAttribute('data-row', i);
-            row.push('empty');
+            row.push(null);
             boardEl.appendChild(cell);
         }
         board.push(row);
@@ -27,7 +32,20 @@ function createBoard(rows, columns){
     return board;
 }
 
-console.log(createBoard(3,4));
+function setCircle(board, col, row, symbol) {
+    if(row < 0) return false;
+
+    let targetElement = document.querySelector(`[data-column="${col}"][data-row="${row}"]`)
+
+    if(!board[row][col]){
+        board[row][col] = symbol;
+        targetElement.innerHTML = symbol;
+        player.place = [row, col];
+    }else
+        setCircle(board, col, --row, symbol);
+}
+
+
 
 function searchedElementDirects(board, player){
     let startingPlace = player.place;
@@ -93,26 +111,24 @@ function checkIfPlayerWon(board, directions, player, winPoints) {
             console.log("WYGRAŁ JEBANY!", pointsInDirection(board, directions[i], player).path)
             return "WYGRANA";
         }
-
-        return false;
     }
 }
 
-let board = 
-    [
-        ["X","X","O","O","O","O","O"],
-        ["X","X","O","X","O","O","O"],
-        ["O","O","X","X","O","O","O"],
-        ["X","O","X","X","O","O","O"],
-        ["X","O","X","X","X","O","O"],
-        ["X","O","X","X","X","O","O"]
-    ];
+//Game Init
+createBoard(boardRow,boardCol);
+rootCss.style.setProperty('--rows', boardRow);
+rootCss.style.setProperty('--columns', boardCol);
 
 
+boardEl.addEventListener('click', function(e) {
+    let clickedCol = Number(e.target.getAttribute('data-column'));
+    let rows = board.length - 1;
 
-console.log(checkIfPlayerWon(
-    board,
-    searchedElementDirects(board, player),
-    player,
-    4))
+    setCircle(board, clickedCol, rows, player.symbol);
 
+    checkIfPlayerWon(
+        board,
+        searchedElementDirects(board, player),
+        player,
+        4)
+})
