@@ -1,18 +1,24 @@
 //Board settings
-let boardRow = 6;
-let boardCol = 7;
+const boardRow = 6;
+const boardCol = 7;
+const pointsToWin = 4;
 let board = [];
-let boardEl = document.querySelector('.board');
+const boardEl = document.querySelector('.board');
+
+//CSS
+const rootCss = document.querySelector(':root');
 
 //Players
-let player = {
-    number: 1,
-    symbol: "X",
-    place: [],
-    hisTurn: true
-}
-
-let rootCss = document.querySelector(':root');
+let currentPlayerTurn = 1;
+let players = [{
+        symbol: "X",
+        place: []
+    },
+    {
+        symbol: "O",
+        place: []
+    }];
+let player = players[0];
 
 
 function createBoard(rows, columns){
@@ -35,7 +41,7 @@ function createBoard(rows, columns){
 function setCircle(board, col, row, symbol) {
     if(row < 0) return false;
 
-    let targetElement = document.querySelector(`[data-column="${col}"][data-row="${row}"]`)
+    let targetElement = document.querySelector(`[data-column="${col}"][data-row="${row}"]`);
 
     if(!board[row][col]){
         board[row][col] = symbol;
@@ -45,7 +51,14 @@ function setCircle(board, col, row, symbol) {
         setCircle(board, col, --row, symbol);
 }
 
+function nextPlayer(players) {
+    currentPlayerTurn++;
 
+    if(currentPlayerTurn > players.length)
+        currentPlayerTurn = 1;
+
+    player = players[currentPlayerTurn - 1];
+}
 
 function searchedElementDirects(board, player){
     let startingPlace = player.place;
@@ -65,15 +78,16 @@ function searchedElementDirects(board, player){
             let firstCoordinate = startingPlace[0] + direction[0];
             let secoundCoordinate = startingPlace[1] + direction[1];
 
-            if(isInBoard(board, firstCoordinate, secoundCoordinate) && 
+            if(isInBoard(firstCoordinate, secoundCoordinate) && 
             (board[startingPlace[0] + direction[0]][startingPlace[1] + direction[1]] === searchedElement))
                 return direction;
     })
 }
 
 //Check if coordinations are in board area
-function isInBoard(board, firstCord, secCord) {
-    return (firstCord < board.length) && (secCord < board.length) && (firstCord >= 0) && (secCord >= 0) ? true : false;
+function isInBoard(firstCord, secCord) {
+    return (firstCord < boardRow) && (secCord < boardCol) &&
+    (firstCord >= 0) && (secCord >= 0) ? true : false;
 }
 
 function sumCords(firstCord, secoundCord) {
@@ -89,7 +103,7 @@ function pointsInDirection(board, currentDirection, player){
     
     function nextElementValue(board, direction, start){
 
-        if(isInBoard(board, start[0], start[1]) && board[start[0]][start[1]] == searchedElement){
+        if(isInBoard(start[0], start[1]) && board[start[0]][start[1]] == searchedElement){
             path.push(start);
             start = sumCords(start, direction);
             points++;
@@ -105,11 +119,16 @@ function pointsInDirection(board, currentDirection, player){
     return {points, path};
 }
 
-function checkIfPlayerWon(board, directions, player, winPoints) {
+function checkIfPlayerWon(board, directions, player) {
     for(let i = 0; i < directions.length; i++) {
-        if(pointsInDirection(board, directions[i], player).points >= winPoints) {
-            console.log("WYGRAŁ JEBANY!", pointsInDirection(board, directions[i], player).path)
-            return "WYGRANA";
+        let pointsInDirectionObj = pointsInDirection(board, directions[i], player);
+
+        if(pointsInDirectionObj.points >= pointsToWin) {
+            pointsInDirectionObj.path.forEach(cord => {
+                let winnerCell = document.querySelector(`[data-row="${cord[0]}"][data-column="${cord[1]}"]`);
+                winnerCell.style.background = 'yellow';
+            })
+            return true;
         }
     }
 }
@@ -122,13 +141,8 @@ rootCss.style.setProperty('--columns', boardCol);
 
 boardEl.addEventListener('click', function(e) {
     let clickedCol = Number(e.target.getAttribute('data-column'));
-    let rows = board.length - 1;
 
-    setCircle(board, clickedCol, rows, player.symbol);
-
-    checkIfPlayerWon(
-        board,
-        searchedElementDirects(board, player),
-        player,
-        4)
+    setCircle(board, clickedCol, boardRow - 1, player.symbol);
+    checkIfPlayerWon(board, searchedElementDirects(board, player), player);
+    nextPlayer(players);
 })
