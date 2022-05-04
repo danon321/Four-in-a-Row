@@ -4,6 +4,7 @@ const boardCol = 7;
 const pointsToWin = 4;
 let board = [];
 const boardEl = document.querySelector('.board');
+const currentPlayerInfo = document.getElementById('current-player');
 
 //CSS
 const rootCss = document.querySelector(':root');
@@ -56,7 +57,7 @@ function nextPlayer(players) {
 
     if(currentPlayerTurn > players.length)
         currentPlayerTurn = 1;
-
+        console.log(player)
     player = players[currentPlayerTurn - 1];
 }
 
@@ -138,6 +139,9 @@ createBoard(boardRow,boardCol);
 rootCss.style.setProperty('--rows', boardRow);
 rootCss.style.setProperty('--columns', boardCol);
 
+window.addEventListener('load', () => {
+    currentPlayerInfo.innerHTML = `Current player: "${player.symbol}"`;
+});
 
 boardEl.addEventListener('click', function(e) {
     let clickedCol = Number(e.target.getAttribute('data-column'));
@@ -145,4 +149,5 @@ boardEl.addEventListener('click', function(e) {
     setCircle(board, clickedCol, boardRow - 1, player.symbol);
     checkIfPlayerWon(board, searchedElementDirects(board, player), player);
     nextPlayer(players);
+    currentPlayerInfo.innerHTML = `Current player: "${player.symbol}"`;
 })

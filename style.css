@@ -11,16 +11,24 @@ body {
 .board {
     display: grid;
     grid: repeat(var(--rows), 100px) / repeat(var(--columns), 100px);
-    gap: 15px;
 }
 
 .board div {
     display: grid;
     place-content: center;
+    border: 5px solid white;
 
     font-size: 50px;
 
     background: red;
 
     cursor: pointer;
+}
+
+.game-info .current-player{    
+    margin: 0;
+    padding-top: 10px;
+    
+    font-weight: 700;
+    font-size: 20px;
 }
