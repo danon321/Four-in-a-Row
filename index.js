@@ -8,19 +8,22 @@ const currentPlayerInfo = document.getElementById('current-player');
 
 //CSS
 const rootCss = document.querySelector(':root');
+let timer;
+const turnLength = 15;
 
 //Players
 let currentPlayerTurn = 1;
-let players = [{
+let players = [
+    {
         symbol: "X",
         place: []
     },
     {
         symbol: "O",
         place: []
-    }];
+    }
+];
 let player = players[0];
-let timer;
 
 
 function createBoard(rows, columns){
@@ -49,6 +52,9 @@ function setCircle(board, col, row, symbol) {
         board[row][col] = symbol;
         targetElement.innerHTML = symbol;
         player.place = [row, col];
+
+        checkIfPlayerWon(board, searchedElementDirects(board, player), player)
+        nextPlayer(players);
     }else
         setCircle(board, col, --row, symbol);
 }
@@ -58,8 +64,9 @@ function nextPlayer(players) {
 
     if(currentPlayerTurn > players.length)
         currentPlayerTurn = 1;
-        console.log(player)
+
     player = players[currentPlayerTurn - 1];
+    currentPlayerInfo.innerHTML = `Current player: "${player.symbol}"`;
 }
 
 function playerTime(secounds){
@@ -69,10 +76,11 @@ function playerTime(secounds){
         if(secounds >= 0){
             document.getElementById('timer').innerHTML = `Timer: 0:${secounds--}`
         }else{
-            console.log('koniec tury')
-            clearInterval(timer);
+            secounds = turnLength;
+            setCircle(board, 0, boardRow - 1, player.symbol);
+            playerTime(secounds);
         }
-    }, 1000)
+    }, 100)
 }
 
 function searchedElementDirects(board, player){
@@ -143,9 +151,18 @@ function checkIfPlayerWon(board, directions, player) {
                 let winnerCell = document.querySelector(`[data-row="${cord[0]}"][data-column="${cord[1]}"]`);
                 winnerCell.style.background = 'yellow';
             })
+                            
+            endOfTheGame();
             return true;
         }
     }
+}
+
+function endOfTheGame(){
+    setTimeout(() => {
+        alert(`WYGRAŁ GRACZ ${player.symbol}`);
+        clearInterval(timer);
+    })
 }
 
 //Game Init
@@ -155,16 +172,13 @@ rootCss.style.setProperty('--columns', boardCol);
 
 window.addEventListener('load', () => {
     currentPlayerInfo.innerHTML = `Current player: "${player.symbol}"`;
-    playerTime(5);
+    playerTime(turnLength);
 });
 
 boardEl.addEventListener('click', function(e) {
     let clickedCol = Number(e.target.getAttribute('data-column'));
 
-    // clearInterval(timerek);
-    playerTime(5);
+    playerTime(turnLength);
     setCircle(board, clickedCol, boardRow - 1, player.symbol);
-    checkIfPlayerWon(board, searchedElementDirects(board, player), player);
-    nextPlayer(players);
-    currentPlayerInfo.innerHTML = `Current player: "${player.symbol}"`;
+
 })
