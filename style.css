@@ -25,10 +25,16 @@ body {
     cursor: pointer;
 }
 
-.game-info .current-player{    
-    margin: 0;
+.game-info{   
+    display: flex;
+    justify-content: space-between;
+
     padding-top: 10px;
     
     font-weight: 700;
     font-size: 20px;
+}
+
+.game-info p {
+    margin: 0;
 }

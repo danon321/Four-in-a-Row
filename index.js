@@ -20,6 +20,7 @@ let players = [{
         place: []
     }];
 let player = players[0];
+let timer;
 
 
 function createBoard(rows, columns){
@@ -59,6 +60,19 @@ function nextPlayer(players) {
         currentPlayerTurn = 1;
         console.log(player)
     player = players[currentPlayerTurn - 1];
+}
+
+function playerTime(secounds){
+    clearInterval(timer);
+
+    timer = setInterval(() => {
+        if(secounds >= 0){
+            document.getElementById('timer').innerHTML = `Timer: 0:${secounds--}`
+        }else{
+            console.log('koniec tury')
+            clearInterval(timer);
+        }
+    }, 1000)
 }
 
 function searchedElementDirects(board, player){
@@ -141,11 +155,14 @@ rootCss.style.setProperty('--columns', boardCol);
 
 window.addEventListener('load', () => {
     currentPlayerInfo.innerHTML = `Current player: "${player.symbol}"`;
+    playerTime(5);
 });
 
 boardEl.addEventListener('click', function(e) {
     let clickedCol = Number(e.target.getAttribute('data-column'));
 
+    // clearInterval(timerek);
+    playerTime(5);
     setCircle(board, clickedCol, boardRow - 1, player.symbol);
     checkIfPlayerWon(board, searchedElementDirects(board, player), player);
     nextPlayer(players);
