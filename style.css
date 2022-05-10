@@ -38,3 +38,7 @@ body {
 .game-info p {
     margin: 0;
 }
+
+.board div.winner-cells {
+    background-color: yellow;
+}

@@ -2,9 +2,9 @@
 const boardRow = 6;
 const boardCol = 7;
 const pointsToWin = 4;
-let board = [];
 const boardEl = document.querySelector('.board');
 const currentPlayerInfo = document.getElementById('current-player');
+let board = [];
 
 //CSS
 const rootCss = document.querySelector(':root');
@@ -53,7 +53,10 @@ function setCircle(board, col, row, symbol) {
         targetElement.innerHTML = symbol;
         player.place = [row, col];
 
-        checkIfPlayerWon(board, searchedElementDirects(board, player), player)
+
+        if(checkIfPlayerWon(board, searchedElementDirects(board, player), player))
+            endOfTheGame(player);
+
         nextPlayer(players);
     }else
         setCircle(board, col, --row, symbol);
@@ -72,15 +75,22 @@ function nextPlayer(players) {
 function playerTime(secounds){
     clearInterval(timer);
 
+    function findEmptyColumn(){
+        for(let i = 0; i <= boardCol; i++){
+            if(!board[0][i])
+                return i;
+        }
+    }
+
     timer = setInterval(() => {
         if(secounds >= 0){
             document.getElementById('timer').innerHTML = `Timer: 0:${secounds--}`
         }else{
             secounds = turnLength;
-            setCircle(board, 0, boardRow - 1, player.symbol);
+            setCircle(board, findEmptyColumn(), boardRow - 1, player.symbol);
             playerTime(secounds);
         }
-    }, 100)
+    }, 1000)
 }
 
 function searchedElementDirects(board, player){
@@ -149,19 +159,21 @@ function checkIfPlayerWon(board, directions, player) {
         if(pointsInDirectionObj.points >= pointsToWin) {
             pointsInDirectionObj.path.forEach(cord => {
                 let winnerCell = document.querySelector(`[data-row="${cord[0]}"][data-column="${cord[1]}"]`);
-                winnerCell.style.background = 'yellow';
+                winnerCell.classList.add('winner-cells');
             })
                             
-            endOfTheGame();
             return true;
         }
     }
 }
 
-function endOfTheGame(){
+function endOfTheGame(player){
     setTimeout(() => {
         alert(`WYGRAŁ GRACZ ${player.symbol}`);
         clearInterval(timer);
+        board = [];
+        boardEl.innerHTML = "";
+        createBoard(boardRow,boardCol);
     })
 }
 
