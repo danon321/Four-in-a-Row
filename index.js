@@ -83,8 +83,13 @@ function playerTime(secounds){
     }
 
     timer = setInterval(() => {
+        secounds--;
+
         if(secounds >= 0){
-            document.getElementById('timer').innerHTML = `Timer: 0:${secounds--}`
+            if(secounds < 10)
+                secounds = '0' + secounds;
+                
+            document.getElementById('timer').innerHTML = `Timer: 0:${secounds}`
         }else{
             secounds = turnLength;
             setCircle(board, findEmptyColumn(), boardRow - 1, player.symbol);
